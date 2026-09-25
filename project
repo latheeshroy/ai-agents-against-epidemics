@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+CORE="$ROOT/osarsa_seq"
+BUILD="$CORE/build"
+RUNTIME="$ROOT/.day_one_runtime"
+OUTPUT="$ROOT/outputs/day_one_policy.txt"
+cmd="${1:-}"
+
+setup() {
+  command -v cmake >/dev/null || { echo 'ERROR: CMake 3.15+ is required.' >&2; exit 2; }
+  command -v c++ >/dev/null || command -v g++ >/dev/null || { echo 'ERROR: a C++17 compiler is required.' >&2; exit 2; }
+  command -v python3 >/dev/null || { echo 'ERROR: Python 3 is required.' >&2; exit 2; }
+
+  cmake_args=(-S "$CORE" -B "$BUILD" -DCMAKE_BUILD_TYPE=Release)
+  if [[ -n "${AM05_EIGEN3_INCLUDE_DIR:-}" ]]; then
+    cmake_args+=("-DEIGEN3_INCLUDE_DIR=${AM05_EIGEN3_INCLUDE_DIR}")
+  fi
+  cmake "${cmake_args[@]}"
+  cmake --build "$BUILD" -j "${AM05_BUILD_JOBS:-2}"
+  echo 'SETUP PASS'
+}
+
+run_planner() {
+  local model="$1"
+  local result="$2"
+  mkdir -p "$(dirname "$result")"
+  "$BUILD/osarsa-seq" "$model" "$result" >/dev/null
+}
+
+test_kit() {
+  [[ -x "$BUILD/osarsa-seq" ]] || setup
+  local tmp
+  tmp="$(mktemp -d "${TMPDIR:-/tmp}/am05-test.XXXXXX")"
+  trap 'rm -rf "$tmp"' RETURN
+  run_planner "$ROOT/example/epidemic_light.dpomdp" "$tmp/epidemic.csv"
+  python3 "$ROOT/tests/test_kit.py" --result "$tmp/epidemic.csv"
+  rm -rf "$tmp"
+  trap - RETURN
+}
+
+day_one() {
+  [[ -x "$BUILD/osarsa-seq" ]] || setup
+  rm -rf "$RUNTIME" "$ROOT/outputs"
+  mkdir -p "$RUNTIME" "$ROOT/outputs"
+  run_planner "$ROOT/example/epidemic_light.dpomdp" "$RUNTIME/search.csv"
+  python3 "$ROOT/tests/test_kit.py" --result "$RUNTIME/search.csv"
+  python3 "$ROOT/render_policy.py" "$RUNTIME/search.csv.policy" "$OUTPUT"
+  python3 "$ROOT/tests/test_kit.py" --student-policy "$OUTPUT"
+  rm -rf "$RUNTIME"
+  echo
+  cat "$OUTPUT"
+  echo 'DAY-ONE PASS'
+  echo 'Inspect: outputs/day_one_policy.txt'
+}
+
+case "$cmd" in
+  setup) setup ;;
+  test) test_kit ;;
+  day-one) day_one ;;
+  *) echo 'Usage: ./project {setup|test|day-one}' >&2; exit 2 ;;
+esac

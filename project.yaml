@@ -1,0 +1,57 @@
+schema_version: 1
+id: PK-2026-006
+title: AI Agents Against Epidemics
+summary: Learn epidemic dynamics from data as a compact ND-POMDP and use the learned model to generate coordinated intervention policies.
+student_description: How can AI agents coordinate interventions against a spreading epidemic? Learn a structured model from suitable epidemic data and use it with oSarsa-seq for decentralised planning.
+research_question: How can epidemic data be used to learn a compact ND-POMDP model for decentralised coordination?
+student_task: Learn and validate an ND-POMDP from suitable synthetic or real epidemic data, connect it to oSarsa-seq, and analyse the resulting coordination policies.
+entry_task: Run the toy SIR-style example and inspect how an epidemic model is used by oSarsa-seq to produce coordinated decisions.
+motivation: Epidemic interventions affect interacting populations, making coordination under uncertainty a structured multi-agent decision problem.
+objectives:
+  - Learn epidemic dynamics from data.
+  - Represent them as a compact ND-POMDP.
+  - Use the learned model with oSarsa-seq.
+  - Evaluate the resulting coordination policies.
+expected_contribution: A validated data-driven ND-POMDP and an analysis of the coordination policies it produces.
+prerequisites:
+  - Basic probability
+  - Python or C++ programming
+themes:
+  - probabilistic modelling
+  - multi-agent systems
+  - sequential decision making
+status: available
+created_year: 2026
+source_courses:
+  - Advanced Machine Learning
+catalogue:
+  discoverable: true
+supervisors:
+  - name: Jilles S. Dibangoye
+    email: j.s.dibangoye@rug.nl
+    role: primary
+student_level:
+  - MSc
+capacity: 1
+one_day_ready:
+  environment: true
+  smoke_test: true
+  starter_experiment: true
+  expected_result_documented: true
+storage:
+  git_policy: code-and-small-results-only
+  large_assets_location: null
+  retrieval_instructions: null
+publication:
+  target: true
+  status: none
+  venue: null
+  doi: null
+repository:
+  visibility: private
+  project_url: null
+  public_url: null
+application:
+  enabled: true
+  method: email
+annual_reviews: []
