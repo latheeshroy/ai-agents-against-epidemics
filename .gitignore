@@ -1,0 +1,5 @@
+osarsa_seq/build/
+outputs/
+.DS_Store
+__pycache__/
+*.pyc
